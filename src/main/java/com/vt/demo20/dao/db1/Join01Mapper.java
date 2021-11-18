@@ -1,7 +1,7 @@
 package com.vt.demo20.dao.db1;
 
 import java.util.List;
-
+import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.ResultMap;
@@ -70,4 +70,6 @@ public interface Join01Mapper {
 	List<Join01Model> selectSkipFirstRowWithWhereClause(@Param("whereClauseProvider") WhereClauseProvider whereClause,
 		@Param("skip") int skip, @Param("first") int first);
 
+	@SelectProvider(type = SqlProviderAdapter.class, method = "select")
+	Map<String, Object> selSumAvgMinMax(SelectStatementProvider selectStatement);
 }

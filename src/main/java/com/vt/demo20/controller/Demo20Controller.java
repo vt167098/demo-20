@@ -1,6 +1,7 @@
 package com.vt.demo20.controller;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.mybatis.dynamic.sql.SqlBuilder;
+import org.mybatis.dynamic.sql.SqlColumn;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.render.TableAliasCalculator;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
@@ -57,9 +59,6 @@ public class Demo20Controller {
 
 	@Autowired
 	private Join01Mapper join01Mapper;
-
-	@Autowired
-	private Cntm010Mapper cntm010Mapper;
 
 	@Autowired
 	private Cntm015Mapper cntm015Mapper;
@@ -194,8 +193,34 @@ public class Demo20Controller {
 	@ResponseBody
 	public String doFunction(@PathVariable String dataid) {
 
-		return http.sync("https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/" + dataid
-				+ "?Authorization=CWB-17DF0251-1CD1-4EE7-A93D-2D0DABB02E96&format=JSON").get().getBody().toString();
+		return http
+				.sync("https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/" + dataid
+						+ "?Authorization=CWB-17DF0251-1CD1-4EE7-A93D-2D0DABB02E96&format=JSON")
+				.get().getBody().toString();
+	}
+
+	@GetMapping("/join06")
+	@CrossOrigin("*")
+	@Tag(name = "讀取合約主檔六(運算)")
+	@ResponseBody
+	public Map<String, Object> sqlFunction(@RequestParam(required = false) String item,
+			@RequestParam(required = false) Integer ctNo, @RequestParam(required = false) Integer saleNo) {
+
+		SelectStatementProvider selectStatement = SqlBuilder
+				.select(SqlBuilder.sum(Cntm010DynamicSqlSupport.ctAmnt).as("sum_ct_amnt"),
+						SqlBuilder.avg(Cntm010DynamicSqlSupport.ctAmnt).as("avg_ct_amnt"),
+						SqlBuilder.min(Cntm010DynamicSqlSupport.saleNo).as("min_sale_no"),
+						SqlBuilder.max(Cntm010DynamicSqlSupport.saleNo).as("max_sale_no"))
+				.from(Cntm010DynamicSqlSupport.cntm010).join(Cntm015DynamicSqlSupport.cntm015)
+				.on(Cntm010DynamicSqlSupport.item, SqlBuilder.equalTo(Cntm015DynamicSqlSupport.item))
+				.and(Cntm010DynamicSqlSupport.ctNo, SqlBuilder.equalTo(Cntm015DynamicSqlSupport.ctNo))
+				.where(Cntm010DynamicSqlSupport.item, SqlBuilder.isEqualTo(item).filter(Objects::nonNull))
+				.and(Cntm010DynamicSqlSupport.ctNo, SqlBuilder.isEqualTo(ctNo).filter(Objects::nonNull))
+				.and(Cntm010DynamicSqlSupport.saleNo, SqlBuilder.isEqualTo(saleNo).filter(Objects::nonNull)).build()
+				.render(RenderingStrategies.MYBATIS3);
+
+		//BigDecimal s = join01Mapper.selSumAvgMinMax(selectStatement);
+		return join01Mapper.selSumAvgMinMax(selectStatement);
 	}
 
 	@GetMapping("/join08/{first}")
@@ -251,7 +276,7 @@ public class Demo20Controller {
 		Integer[] rowCount = { 0 };
 
 		ObjectMapper mapper = new ObjectMapper();
-		List<Cntm015> cntm015 = new ArrayList<>();
+		new ArrayList<>();
 
 		ArrayList<LinkedHashMap<String, Object>> list = (ArrayList<LinkedHashMap<String, Object>>) body;
 
