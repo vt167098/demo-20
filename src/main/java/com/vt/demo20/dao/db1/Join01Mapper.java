@@ -53,7 +53,7 @@ public interface Join01Mapper {
 			"join psnm110 on cntm010.sale_no=psnm110.emp_no ",
 			"join basm060 on cntm010.cust_no=basm060.cust_no ",
 			"${whereClauseProvider.whereClause}" })
-	@ResultMap("Join01Result")
+	//@ResultMap("Join01Result")
 	List<Join01Model> selectFirstRowWithWhereClause(@Param("whereClauseProvider") WhereClauseProvider whereClause,
 			@Param("first") int first);
 
@@ -66,7 +66,7 @@ public interface Join01Mapper {
 		"join psnm110 c on a.sale_no=c.emp_no ",
 		"join basm060 d on a.cust_no=d.cust_no ",
 		"${whereClauseProvider.whereClause}" })
-	@ResultMap("Join01Result")
+	//@ResultMap("Join01Result")
 	List<Join01Model> selectSkipFirstRowWithWhereClause(@Param("whereClauseProvider") WhereClauseProvider whereClause,
 		@Param("skip") int skip, @Param("first") int first);
 
